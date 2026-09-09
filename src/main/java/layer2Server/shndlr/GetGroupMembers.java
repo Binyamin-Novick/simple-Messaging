@@ -34,19 +34,25 @@ public class GetGroupMembers extends handler{
                 os.close();
                 return;
             }catch (Exception e){
+                System.out.println(e);
                 throw new RuntimeException(e);
             }
         }
         List<Long>mid=new ArrayList<>();
         List<String>usernames=new ArrayList<>();
+        System.out.println(body.get(http.Reqfield.gid));
         try {
-            long[]res= sl.getMyGusers(body.get(http.Reqfield.token), Long.valueOf(body.get(http.Reqfield.gid)),mid,usernames);
+            long[]res= sl.getMyGusers(body.get(http.Reqfield.token), Long.parseLong(body.get(http.Reqfield.gid)),mid,usernames);
+            System.out.println(res[0]);
+            System.out.println(res[1]);
             if(res[0]==MacroDef.ok){
                 HashMap<Long,String>gms=new HashMap<>();
+                System.out.println(mid.size());
                 for(int i=0;i<mid.size();i++){
                     gms.put(mid.get(i),usernames.get(i));
                 }
                 String gmsJ=gson.toJson(gms);
+                System.out.println(gmsJ);
                 exchange.sendResponseHeaders(200, gmsJ.length());
                 try (java.io.OutputStream os = exchange.getResponseBody()) {
                     os.write(gmsJ.getBytes());
@@ -55,6 +61,7 @@ public class GetGroupMembers extends handler{
                     return;
                 }catch (Exception e){
 
+                System.out.println(e);
                     throw new RuntimeException(e);
                 }
 
@@ -64,8 +71,10 @@ public class GetGroupMembers extends handler{
             }else if(res[0]==MacroDef.timeout)exchange.sendResponseHeaders(408, 0);
             else exchange.sendResponseHeaders(500, 0);
         } catch (SQLException e) {
+            System.out.println(e);
             throw new RuntimeException(e);
         }
+        exchange.close();
 
 
     }

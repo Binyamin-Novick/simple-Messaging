@@ -137,8 +137,8 @@ public class MacroDef {
             public static String getMyGroupMembers(){
                 return "SELECT " + users.c(users.id) +","+ users.c(users.name) +
                         " FROM " + users.Name+ JoinnOn(users,users.id,gm,gm.Uid)+
-                        " JOIN " + gm.Name + "x"+" ON " + gm.c(gm.Uid) + " = " + "x."+ gm.Uid
-                        + " WHERE " + "x."+gm.Gid + " = ? AND x." +gm.Uid  + " = ?";
+                        " JOIN " + gm.Name + " x "+" ON " + gm.c(gm.Gid) + " = " + " x."+ gm.Gid
+                        + " WHERE " + " x."+gm.Gid + " = ? AND x." +gm.Uid  + " = ?";
             }
             public static String getMemberId(){
                 return "SELECT " + users.id + " FROM " + users.Name + " WHERE " + users.name + " = ?";

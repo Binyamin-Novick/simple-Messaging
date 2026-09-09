@@ -19,10 +19,12 @@ public class sendMessege extends handler{
         this.requerdFields.add(MacroDef.http.Reqfield.token);
         this.requerdFields.add(MacroDef.http.Reqfield.messege);
         this.requerdFields.add(MacroDef.http.Reqfield.gid);
+        this.requerdFields.add(MacroDef.http.Reqfield.username);
     }
 
     @Override
     public void handle(HttpExchange exchange) throws IOException {
+        System.out.println("messege sent");
         boolean[] good=new boolean[1];
         HashMap<String,String> body =super.getGson(exchange,good);
         if(!good[0]){
@@ -41,9 +43,14 @@ public class sendMessege extends handler{
                 ,body.get(MacroDef.http.Reqfield.username));
 
         try {
+            System.out.println("messege sent a");
             long []res= sl.insertMessage(body.get(MacroDef.http.Reqfield.token),m);
+            System.out.println("messege sent b");
             if(res[0]==MacroDef.ok){
                 exchange.sendResponseHeaders(200, 0);
+
+                System.out.println("messege sent c");
+                exchange.getResponseBody().close();
 
             }if(res[0]==MacroDef.fail){
                 if(res[1]==MacroDef.invalidtoken)exchange.sendResponseHeaders(401, 0);
@@ -52,7 +59,10 @@ public class sendMessege extends handler{
             }
             if(res[0]==MacroDef.timeout)exchange.sendResponseHeaders(408, 0);
             else exchange.sendResponseHeaders(500, 0);
+            exchange.getResponseBody().close();
         } catch (SQLException e) {
+            System.out.println("messege sent error");
+            System.out.println(e);
             throw new RuntimeException(e);
         }
     }

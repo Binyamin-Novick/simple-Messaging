@@ -38,6 +38,7 @@ public class getUId extends handler{
             long[]res=sl.getUID(body.get(http.Reqfield.username));
             if(res[0]== MacroDef.ok){
                 String value = String.valueOf(res[1]);
+                System.out.println(value);
                 exchange.sendResponseHeaders(200, value.length());
                 try (java.io.OutputStream os = exchange.getResponseBody()) {
                     os.write(value.getBytes());

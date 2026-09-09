@@ -47,6 +47,8 @@ public class getMessges extends handler{
             exchange.sendResponseHeaders(400, response.length());
             try (java.io.OutputStream os = exchange.getResponseBody()) {
                 os.write(response.getBytes());
+                os.flush();
+                os.close();
             }
             return;
         }
@@ -59,6 +61,8 @@ public class getMessges extends handler{
                 exchange.sendResponseHeaders(200, response.getBytes().length);
                 try (java.io.OutputStream os = exchange.getResponseBody()) {
                     os.write(response.getBytes());
+                    os.flush();
+                    os.close();
                 }
                 return;
             }

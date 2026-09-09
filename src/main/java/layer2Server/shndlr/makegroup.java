@@ -20,6 +20,7 @@ public class makegroup extends handler{
 
     @Override
     public void handle(HttpExchange exchange) throws IOException {
+        System.out.println("group created");
         boolean[] good=new boolean[1];
         HashMap<String,String> body =super.getGson(exchange,good);
         if(!good[0]){
@@ -38,6 +39,8 @@ public class makegroup extends handler{
             long[]res= sl.createGroup(body.get(MacroDef.http.Reqfield.token),body.get(MacroDef.http.Reqfield.groupName));
             if(res[0]==MacroDef.ok){
                 exchange.sendResponseHeaders(200, 0);
+                exchange.getResponseBody().close();
+                System.out.println("group created finshed");
             }else if(res[0]==MacroDef.fail) {
                 if (res[1] == MacroDef.invalidtoken) exchange.sendResponseHeaders(401, 0);
 
@@ -45,6 +48,8 @@ public class makegroup extends handler{
             }else if(res[0]==MacroDef.timeout)exchange.sendResponseHeaders(408, 0);
             else exchange.sendResponseHeaders(500, 0);
         } catch (SQLException e) {
+            System.out.println("error");
+
             throw new RuntimeException(e);
         }
     }

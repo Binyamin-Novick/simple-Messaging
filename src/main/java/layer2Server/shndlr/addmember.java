@@ -52,5 +52,7 @@ public class addmember extends handler{
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
+        exchange.close();
     }
+
 }

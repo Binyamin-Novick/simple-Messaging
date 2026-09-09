@@ -18,11 +18,13 @@ public class PosgressCumuncater {
 
     public PosgressCumuncater(long cons) throws SQLException {
         if (cons < 1) throw new IllegalArgumentException("Connection count must be at least 1");
+        String password = System.getenv("psw");
+        System.out.println(password);
         for (long i = 0; i < cons; i++) {
             conns.add(DriverManager.getConnection(
-                    "jdbc:postgresql://localhost:5432/mydb",
+                    "jdbc:postgresql://localhost:5432/simplechatdb",
                     "postgres",
-                    "password"
+                    password
             ));
         }
     }
@@ -131,16 +133,16 @@ public class PosgressCumuncater {
         stmt.setString(1, m.sender);
         stmt.setString(2, m.mc);
         stmt.setTimestamp(3, m.tm);
-        stmt.setString(4, m.groupID);
+        stmt.setLong(4, Long.parseLong(m.groupID));
         stmt.setLong(5, id);
-        stmt.setString(6, m.groupID);
+        stmt.setLong(6, Long.parseLong(m.groupID));
 
         int rows = stmt.executeUpdate();
         stmt.close();
 
         if (rows > 0) {
             PreparedStatement memberStmt = conn.prepareStatement(MacroDef.Sql.Prep.getGroupMembers());
-            memberStmt.setString(1, m.groupID);
+            memberStmt.setLong(1, Long.parseLong(m.groupID));
             ResultSet rs = memberStmt.executeQuery();
             while (rs.next()) {
                 long uid = rs.getLong(MacroDef.Sql.GroupMembers.Uid);
@@ -309,6 +311,7 @@ public class PosgressCumuncater {
         try {
             conn = conns.poll(MacroDef.timeoutLength,TimeUnit.MILLISECONDS);
             if(conn==null)return MacroDef.timeout;
+            System.out.println(MacroDef.Sql.Prep.createUser());
             PreparedStatement stmt = conn.prepareCall(MacroDef.Sql.Prep.createUser());
             stmt.setString(1, username);
             stmt.setString(2, password);
@@ -317,7 +320,8 @@ public class PosgressCumuncater {
             if(rows>0)return MacroDef.ok;
             else return MacroDef.fail;
         }catch (Exception e){
-            return MacroDef.error;
+            throw new RuntimeException(e);
+           // return MacroDef.error;
         } finally {
             returnConnection(conn);
         }
@@ -371,13 +375,14 @@ public class PosgressCumuncater {
             stmt.setLong(2,myuid);
             ResultSet rs = stmt.executeQuery();
             while (rs.next()){
-                uid.add(rs.getLong(users.c(users.id)));
-                names.add(rs.getString(users.c(users.name)));
+                uid.add(rs.getLong(users.id));
+                names.add(rs.getString(users.name));
             }
             rs.close();
             stmt.close();
             return MacroDef.ok;
         }catch (Exception e){
+            System.out.println(e);
             return MacroDef.error;
         } finally {
             returnConnection(conn);
@@ -394,7 +399,7 @@ public long getUid(String username,long[]feedback) throws SQLException{
             ResultSet rs = stmt.executeQuery();
             if(rs.next()){
                feedback[0]=MacroDef.ok;
-               long res=rs.getLong(users.c(users.id));
+               long res=rs.getLong(users.id);
                 return res;
             }
             else {
@@ -402,6 +407,7 @@ public long getUid(String username,long[]feedback) throws SQLException{
                 return 0;
             }
         } catch (Exception e) {
+            System.out.println(e);
             return MacroDef.error;
         } finally {
             returnConnection(conn);
